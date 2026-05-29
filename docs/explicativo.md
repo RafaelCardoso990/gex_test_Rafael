@@ -61,7 +61,7 @@ As UNIQUE (`idempotency_keys`, email, `(gateway, transaction_id)`, `(order_id, e
   forma síncrona e race-safe no receiver.
 - **Os 4 canais são criados na própria `sp_insert_lead`** (atomicidade total); só o SMS é distribuído.
 - **Tudo em UTC** no banco; lag em segundos.
-- **Canal SMS:** a entrega é validada contra `https://webhook.site/7a9a03e2-3db1-4a67-9adb-31f9ed9790a7`
+- **Canal SMS:** a entrega é validada contra `https://webhook.site/c1788114-8b5d-4fe3-9aaa-d58eb74e2306`
   (URL fornecida ao avaliador). O `sink` local (httpbin) é o default do compose para ambiente offline;
   basta exportar `SMS_WEBHOOK_URL` para a URL acima ao subir a stack para reproduzir a entrega no
   webhook.site.

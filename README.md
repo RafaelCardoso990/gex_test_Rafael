@@ -271,9 +271,9 @@ Painéis para inspecionar:
 | Receiver (health) | http://localhost:8000/health | — |
 
 > **SMS / webhook.site:** a URL de validação usada na entrega é
-> `https://webhook.site/7a9a03e2-3db1-4a67-9adb-31f9ed9790a7` (125 entregas ao vivo lá durante a
+> `https://webhook.site/c1788114-8b5d-4fe3-9aaa-d58eb74e2306` (125 entregas ao vivo lá durante a
 > validação). Para reproduzir, suba a stack com:
-> `SMS_WEBHOOK_URL="https://webhook.site/7a9a03e2-3db1-4a67-9adb-31f9ed9790a7" docker compose up -d`.
+> `SMS_WEBHOOK_URL="https://webhook.site/c1788114-8b5d-4fe3-9aaa-d58eb74e2306" docker compose up -d`.
 > Sem essa variável, o distribuidor cai num `sink` local (httpbin) e funciona offline.
 
 ## Rodando os testes
