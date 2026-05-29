@@ -2,10 +2,11 @@
 
 Backend que recebe webhooks de gateways de pagamento, decripta (quando preciso), valida, persiste,
 publica em filas (RabbitMQ) e distribui leads para canais de marketing. Construído em **Python 3.12 +
-FastAPI**, **MySQL 8** (SQL puro), **RabbitMQ**, com observabilidade (logs JSON + Prometheus + Jaeger)
-e orquestração via **docker-compose**.
+FastAPI**, **MySQL 8** (SQL puro), **RabbitMQ**, orquestração via **docker-compose**.
 
 ---
+
+# Link Loom - **https://www.loom.com/share/b66516f8ad734242bd10f6f21a07509f**
 
 ## 1. Arquitetura (visão de componentes)
 
