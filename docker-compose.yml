@@ -1,0 +1,95 @@
+# `docker compose up` sobe TUDO: MySQL + RabbitMQ + receiver + workers + painéis, sem passo manual.
+x-app-env: &app-env
+  MYSQL_HOST: mysql
+  MYSQL_PORT: "3306"
+  MYSQL_USER: root
+  MYSQL_PASSWORD: root
+  MYSQL_DB: gex
+  RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+
+x-app-deps: &app-deps
+  mysql:
+    condition: service_healthy
+  rabbitmq:
+    condition: service_healthy
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: gex_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gex
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # The mysql CLI runs these on first init (it understands DELIMITER, unlike a raw driver).
+      - ./sql/001_create_tables.sql:/docker-entrypoint-initdb.d/001_create_tables.sql:ro
+      - ./sql/002_indexes.sql:/docker-entrypoint-initdb.d/002_indexes.sql:ro
+      - ./sql/003_stored_procs.sql:/docker-entrypoint-initdb.d/003_stored_procs.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  adminer:
+    image: adminer:latest
+    container_name: gex_adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: gex_rabbitmq
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # management UI (guest/guest)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Local stand-in for the SMS channel (returns 200). Swap SMS_WEBHOOK_URL for your webhook.site URL.
+  sink:
+    image: kennethreitz/httpbin
+    container_name: gex_sink
+
+  receiver:
+    build: .
+    container_name: gex_receiver
+    environment:
+      <<: *app-env
+      GRUMMER_KEY_PATH: /app/grummer_secret.txt
+    volumes:
+      - ./docs/grummer_secret.txt:/app/grummer_secret.txt:ro
+    ports:
+      - "8000:8000"
+    depends_on: *app-deps
+
+  consumer:
+    build: .
+    container_name: gex_consumer
+    command: python -m app.workers.consumer
+    environment:
+      <<: *app-env
+    depends_on: *app-deps
+
+  distributor:
+    build: .
+    container_name: gex_distributor
+    command: python -m app.workers.distributor
+    environment:
+      <<: *app-env
+      SMS_WEBHOOK_URL: ${SMS_WEBHOOK_URL:-http://sink/post}
+    depends_on: *app-deps
+
+volumes:
+  mysql_data:
