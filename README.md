@@ -6,7 +6,7 @@ FastAPI**, **MySQL 8** (SQL puro), **RabbitMQ**, orquestração via **docker-com
 
 ---
 
-# Link Loom - **https://www.loom.com/share/b66516f8ad734242bd10f6f21a07509f**
+# Gravação **https://www.loom.com/share/b66516f8ad734242bd10f6f21a07509f**
 
 ## 1. Arquitetura (visão de componentes)
 
